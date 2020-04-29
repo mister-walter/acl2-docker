@@ -26,10 +26,10 @@ RUN apt-get update && \
 
 RUN mkdir /root/sbcl \
     && cd /root \
-    && wget "http://prdownloads.sourceforge.net/sbcl/sbcl-2.0.2-source.tar.bz2?download" -O sbcl.tar.bz2 -q \
+    && wget "http://prdownloads.sourceforge.net/sbcl/sbcl-2.0.3-source.tar.bz2?download" -O sbcl.tar.bz2 -q \
     && tar -xjf sbcl.tar.bz2 \
     && rm sbcl.tar.bz2 \
-    && cd sbcl-2.0.2 \
+    && cd sbcl-2.0.3 \
     && sh make.sh --without-immobile-space --without-immobile-code --without-compact-instance-header --fancy --dynamic-space-size=4Gb \
     && apt-get remove -y sbcl \
     && sh install.sh
@@ -42,13 +42,7 @@ RUN cd /tmp && \
     perl /tmp/fix-quicklisp.pl &&\
     sbcl --eval '(load "/root/quicklisp/setup.lisp")' --eval "(ql:add-to-init-file)"
 
-ARG ACL2_REPO_LATEST_COMMIT=0
-ENV ACL2_SNAPSHOT_INFO="Git commit hash: ${ACL2_REPO_LATEST_COMMIT}"
-RUN wget "https://api.github.com/repos/acl2/acl2/zipball/${ACL2_COMMIT}" -O /tmp/acl2.zip -q &&\
-    unzip /tmp/acl2.zip -d /root/acl2_extract &&\
-    rm /tmp/acl2.zip &&\
-    mv /root/acl2_extract/$(ls /root/acl2_extract) /root/acl2 &&\
-    rmdir /root/acl2_extract
+RUN git clone --depth 1 -b 8.3 git://github.com/acl2/acl2.git /root/acl2
 
 ARG ACL2_BUILD_OPTS=""
 ARG ACL2_CERTIFY_OPTS="-j 4"
