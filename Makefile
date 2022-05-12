@@ -3,7 +3,7 @@ all: build
 
 ACL2_COMMIT ?= $(shell curl --silent https://api.github.com/repos/acl2/acl2/commits/master | jq -r .sha)
 
-IMAGE_VERSION ?= latest
+IMAGE_VERSION ?= ccl-latest
 LOCAL_IMAGE_NAME ?= acl2
 REMOTE_IMAGE_NAME ?= atwalter/acl2
 DOCKERFILE ?= Dockerfile

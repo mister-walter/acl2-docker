@@ -18,21 +18,15 @@ RUN apt-get update && \
         libssl-dev \
         wget \
         perl \
-        sbcl \
         zlib1g-dev \
         curl \
         unzip \
     && rm -rf /var/lib/apt/lists/* # remove cached apt files
 
-RUN mkdir /root/sbcl \
-    && cd /root \
-    && wget "http://prdownloads.sourceforge.net/sbcl/sbcl-2.1.11-source.tar.bz2?download" -O sbcl.tar.bz2 -q \
-    && tar -xjf sbcl.tar.bz2 \
-    && rm sbcl.tar.bz2 \
-    && cd sbcl-* \
-    && sh make.sh --without-immobile-space --without-immobile-code --without-compact-instance-header --fancy --dynamic-space-size=4Gb \
-    && apt-get remove -y sbcl \
-    && sh install.sh
+RUN cd /root \
+    && wget "https://github.com/Clozure/ccl/releases/download/v1.12.1/ccl-1.12.1-linuxx86.tar.gz" -O ccl.tar.gz -q \
+    && tar -xzf ccl.tar.gz \
+    && rm ccl.tar.gz
 
 ARG ACL2_COMMIT=0
 ENV ACL2_SNAPSHOT_INFO="Git commit hash: ${ACL2_COMMIT}"
@@ -47,9 +41,9 @@ ARG ACL2_CERTIFY_OPTS="-j 4"
 ARG ACL2_CERTIFY_TARGETS="basic"
 
 RUN cd /root/acl2 \
-    && make LISP="sbcl" $ACL2_BUILD_OPTS \
-    && cd books \
-    && make $ACL2_CERTIFY_TARGETS ACL2=/root/acl2/saved_acl2 $ACL2_CERTIFY_OPTS
+    && make LISP="/root/ccl/lx86cl64" $ACL2_BUILD_OPTS
+    #&& cd books \
+    #&& make $ACL2_CERTIFY_TARGETS ACL2=/root/acl2/saved_acl2 $ACL2_CERTIFY_OPTS
 
 RUN apt-get remove -y \
     build-essential \
